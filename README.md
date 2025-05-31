@@ -16,7 +16,7 @@ A powerful command-line interface for interacting with multiple AI models throug
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/orb-cli.git
+git clone https://github.com/ikarza/orb-cli.git
 cd orb-cli
 
 # Install dependencies
