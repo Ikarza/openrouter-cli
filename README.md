@@ -1,6 +1,6 @@
-# OpenRouter CLI (orc)
+# OpenRouter CLI (ORC)
 
-A powerful command-line interface for interacting with multiple AI models through OpenRouter's unified API.
+A powerful command-line interface for interacting with multiple AI models through [OpenRouter](https://openrouter.ai's) unified API.
 
 ## Features
 
@@ -217,7 +217,7 @@ export OPENROUTER_API_KEY=your-api-key
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/openrouter-cli.git
+git clone https://github.com/ikarza/openrouter-cli.git
 cd openrouter-cli
 
 # Install dependencies
@@ -243,4 +243,4 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## Support
 
-For issues, questions, or suggestions, please open an issue on [GitHub](https://github.com/yourusername/openrouter-cli/issues).
+For issues, questions, or suggestions, please open an issue on [GitHub](https://github.com/ikarza/openrouter-cli/issues).
