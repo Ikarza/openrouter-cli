@@ -2,16 +2,19 @@ import OpenRouterClient from './api.js';
 import chalk from 'chalk';
 import ora from 'ora';
 import { truncateText } from './utils.js';
+import type { Model } from '../types/index.js';
 
 export class ModelManager {
-  constructor(apiKey) {
+  private client: OpenRouterClient;
+  private models: Model[] = [];
+  private lastFetch: number | null = null;
+  private readonly cacheTimeout = 300000; // 5 minutes
+
+  constructor(apiKey: string) {
     this.client = new OpenRouterClient(apiKey);
-    this.models = [];
-    this.lastFetch = null;
-    this.cacheTimeout = 300000; // 5 minutes
   }
 
-  async fetchModels(force = false) {
+  async fetchModels(force: boolean = false): Promise<Model[]> {
     if (!force && this.lastFetch && Date.now() - this.lastFetch < this.cacheTimeout) {
       return this.models;
     }
@@ -29,21 +32,21 @@ export class ModelManager {
     }
   }
 
-  async listModels(options = {}) {
+  async listModels(options: { filter?: string; force?: boolean } = {}): Promise<Model[]> {
     const models = await this.fetchModels(options.force);
     
     if (options.filter) {
-      const filtered = models.filter(model => 
-        model.id.toLowerCase().includes(options.filter.toLowerCase()) ||
-        (model.name && model.name.toLowerCase().includes(options.filter.toLowerCase()))
+      const filterLower = options.filter.toLowerCase();
+      return models.filter(model => 
+        model.id.toLowerCase().includes(filterLower) ||
+        (model.name && model.name.toLowerCase().includes(filterLower))
       );
-      return filtered;
     }
     
     return models;
   }
 
-  async searchModels(query) {
+  async searchModels(query: string): Promise<Model[]> {
     const models = await this.fetchModels();
     const queryLower = query.toLowerCase();
     
@@ -56,32 +59,47 @@ export class ModelManager {
     });
   }
 
-  async getModelInfo(modelId) {
+  async getModelInfo(modelId: string): Promise<Model | undefined> {
     const models = await this.fetchModels();
     return models.find(model => model.id === modelId);
   }
 
-  formatModelList(models, verbose = false) {
+  formatModelList(models: Model[], verbose: boolean = false): string {
     if (models.length === 0) {
       return chalk.yellow('No models found');
     }
 
-    const output = [];
+    // Sort models: free models first, then by ID
+    const sortedModels = [...models].sort((a, b) => {
+      const aIsFree = this.isFreeModel(a);
+      const bIsFree = this.isFreeModel(b);
+      
+      if (aIsFree && !bIsFree) return -1;
+      if (!aIsFree && bIsFree) return 1;
+      return a.id.localeCompare(b.id);
+    });
+
+    const output: string[] = [];
     
-    for (const model of models) {
+    for (const model of sortedModels) {
       const pricing = this.formatPricing(model.pricing);
       const context = model.context_length ? `Context: ${model.context_length.toLocaleString()}` : '';
+      const isFree = this.isFreeModel(model);
       
       let line = chalk.cyan(model.id);
+      
+      if (isFree) {
+        line += chalk.green(' (free)');
+      }
       
       if (model.name && model.name !== model.id) {
         line += chalk.gray(` (${model.name})`);
       }
       
       if (verbose) {
-        const details = [];
+        const details: string[] = [];
         if (context) details.push(context);
-        if (pricing) details.push(pricing);
+        if (!isFree && pricing) details.push(pricing);
         if (model.description) {
           details.push(chalk.gray(truncateText(model.description, 60)));
         }
@@ -90,9 +108,9 @@ export class ModelManager {
           line += '\n  ' + details.join(' | ');
         }
       } else {
-        const details = [];
+        const details: string[] = [];
         if (context) details.push(context);
-        if (pricing) details.push(pricing);
+        if (!isFree && pricing) details.push(pricing);
         
         if (details.length > 0) {
           line += chalk.gray(' - ' + details.join(' | '));
@@ -105,7 +123,12 @@ export class ModelManager {
     return output.join('\n');
   }
 
-  formatPricing(pricing) {
+  private isFreeModel(model: Model): boolean {
+    if (!model.pricing) return true;
+    return model.pricing.prompt === 0 && model.pricing.completion === 0;
+  }
+
+  private formatPricing(pricing?: { prompt?: number; completion?: number }): string | null {
     if (!pricing) return null;
     
     const prompt = pricing.prompt ? `$${pricing.prompt}/1K` : null;
@@ -120,14 +143,52 @@ export class ModelManager {
     return null;
   }
 
-  formatModelInfo(model) {
+  async getModelsByOrganization(): Promise<Map<string, Model[]>> {
+    const models = await this.fetchModels();
+    const grouped = new Map<string, Model[]>();
+    
+    for (const model of models) {
+      const org = this.extractOrganization(model.id);
+      if (!grouped.has(org)) {
+        grouped.set(org, []);
+      }
+      grouped.get(org)!.push(model);
+    }
+    
+    // Sort models within each organization
+    for (const [org, orgModels] of grouped) {
+      grouped.set(org, orgModels.sort((a, b) => {
+        const aIsFree = this.isFreeModel(a);
+        const bIsFree = this.isFreeModel(b);
+        
+        if (aIsFree && !bIsFree) return -1;
+        if (!aIsFree && bIsFree) return 1;
+        return a.id.localeCompare(b.id);
+      }));
+    }
+    
+    return grouped;
+  }
+
+  extractOrganization(modelId: string): string {
+    const parts = modelId.split('/');
+    return parts.length > 1 && parts[0] ? parts[0] : 'other';
+  }
+
+  async getOrganizations(): Promise<string[]> {
+    const grouped = await this.getModelsByOrganization();
+    return Array.from(grouped.keys()).sort();
+  }
+
+  formatModelInfo(model: Model | undefined): string {
     if (!model) {
       return chalk.red('Model not found');
     }
 
-    const lines = [];
+    const lines: string[] = [];
+    const isFree = this.isFreeModel(model);
     
-    lines.push(chalk.bold.cyan(`Model: ${model.id}`));
+    lines.push(chalk.bold.cyan(`Model: ${model.id}`) + (isFree ? chalk.green(' (free)') : ''));
     
     if (model.name && model.name !== model.id) {
       lines.push(`Name: ${model.name}`);
@@ -146,6 +207,8 @@ export class ModelManager {
       if (pricing) {
         lines.push(pricing);
       }
+    } else if (isFree) {
+      lines.push(chalk.green('Pricing: Free'));
     }
     
     if (model.top_provider) {
