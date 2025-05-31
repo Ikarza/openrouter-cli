@@ -1,0 +1,45 @@
+# Source control
+.git/
+.gitignore
+
+# Development files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Test files
+test/
+tests/
+*.test.js
+*.spec.js
+coverage/
+.nyc_output/
+
+# Documentation source
+docs/
+*.md
+!README.md
+
+# Configuration
+.env
+.env.*
+.orb-cli/
+
+# CI/CD
+.github/
+.travis.yml
+.gitlab-ci.yml
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Development dependencies
+.eslintrc*
+.prettierrc*
+.editorconfig

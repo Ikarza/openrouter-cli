@@ -1,4 +1,4 @@
-# Orb CLI
+# OpenRouter CLI
 
 A powerful command-line interface for interacting with multiple AI models through OpenRouter's unified API. Experience a Claude Code-like chat interface directly from your terminal.
 
@@ -16,8 +16,8 @@ A powerful command-line interface for interacting with multiple AI models throug
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/orb-cli.git
-cd orb-cli
+git clone https://github.com/yourusername/openrouter-cli.git
+cd openrouter-cli
 
 # Install dependencies
 npm install
@@ -164,7 +164,7 @@ orb chat --profile compare
 
 ## Configuration
 
-Configuration is stored in `~/.orb-cli/config.json` with encrypted API keys.
+Configuration is stored in `~/.openrouter-cli/config.json` with encrypted API keys.
 
 ### Environment Variables
 
@@ -216,4 +216,4 @@ MIT License - see LICENSE file for details
 ## Support
 
 For issues and feature requests, please visit:
-https://github.com/yourusername/orb-cli/issues# orb-cli
+https://github.com/yourusername/openrouter-cli/issues
