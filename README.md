@@ -1,6 +1,6 @@
 # OpenRouter CLI (ORC)
 
-A powerful command-line interface for interacting with multiple AI models through [OpenRouter](https://openrouter.ai's) unified API.
+A powerful command-line interface for interacting with AI models via [OpenRouter](https://openrouter.ai's) API.
 
 ## Features
 
