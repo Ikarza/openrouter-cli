@@ -144,7 +144,7 @@ orc template create code-review \
   --system "You are a code reviewer" \
   --prompt "Review the following code: {prompt}" \
   --models gpt-4-turbo claude-3-opus-20240229 \
-  --temperature 0.3
+  --temperature 0.7
 
 # List all templates
 orc template list
