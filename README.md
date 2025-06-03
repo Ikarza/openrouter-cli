@@ -10,6 +10,11 @@ A powerful command-line interface for interacting with multiple AI models throug
 - 🎨 **Beautiful Output**: Color-coded responses with model identification
 - ⚡ **Streaming Responses**: Real-time streaming for immediate feedback
 - 🔧 **Flexible Configuration**: Customize temperature, max tokens, and more
+- 📝 **Template System**: Create reusable prompt templates for common tasks
+- 🔄 **Batch Processing**: Process multiple prompts from files
+- 🔗 **Prompt Chaining**: Chain outputs from one prompt as input to another
+- 📤 **Export/Import**: Export conversations to multiple formats and import from other platforms
+- 💻 **Code Integration**: Analyze code files and git diffs directly
 
 ## Installation
 
@@ -62,6 +67,15 @@ orc ask "Your question" --model claude-3-opus-20240229
 
 # Use a specific profile
 orc ask "Your question" --profile creative
+
+# Use a template
+orc ask "Review this code" --template code-review
+
+# Include file content
+orc ask "Explain this code" --file script.py
+
+# Include multiple files
+orc ask "Compare these implementations" --files file1.js file2.js
 ```
 
 ### Interactive Chat
@@ -122,6 +136,79 @@ orc profile delete myprofile
 orc profile set-default myprofile
 ```
 
+### Template Management
+
+```bash
+# Create a new template
+orc template create code-review \
+  --system "You are a code reviewer" \
+  --prompt "Review the following code: {prompt}" \
+  --models gpt-4-turbo claude-3-opus-20240229 \
+  --temperature 0.3
+
+# List all templates
+orc template list
+
+# Delete a template
+orc template delete code-review
+```
+
+### Batch Processing
+
+```bash
+# Process prompts from a file (one prompt per line)
+orc batch prompts.txt --models gpt-4-turbo claude-3-haiku-20240307
+
+# Save results to a file
+orc batch prompts.txt --output results.json
+
+# Export as markdown
+orc batch prompts.txt --output results.md --format markdown
+
+# Export as CSV
+orc batch prompts.txt --output results.csv --format csv
+```
+
+### Prompt Chaining
+
+```bash
+# Chain prompts together (interactive)
+orc chain --steps "Summarize this: {input}" "Extract key points: {input}" "Create action items: {input}"
+
+# The chain command will:
+# 1. Ask for initial input
+# 2. Process through each step
+# 3. Use output from each step as input for the next
+```
+
+### Export/Import Conversations
+
+```bash
+# Export conversation to different formats
+orc export markdown conversation.md --conversation chat-history.json
+orc export html conversation.html --conversation chat-history.json --syntax-highlight
+orc export json conversation.json --conversation chat-history.json --include-metadata
+
+# Import from other platforms
+orc import chatgpt-export.json --type chatgpt
+orc import claude-export.json --type claude
+orc import generic-chat.json --type generic
+```
+
+### Code Integration
+
+```bash
+# Analyze git changes
+orc git-diff              # Analyze changes since last commit
+orc git-diff HEAD~3       # Analyze last 3 commits
+orc git-diff main         # Compare with main branch
+
+# The git-diff command will:
+# 1. Show changed files and statistics
+# 2. Ask what you want to know about the changes
+# 3. Provide AI analysis of the diff
+```
+
 ## Profiles
 
 Profiles allow you to save different configurations for different use cases:
@@ -162,6 +249,72 @@ orc ask "Write a haiku about programming" --profile creative
 orc ask "What are the pros and cons of TypeScript?" --profile default
 ```
 
+### Advanced Examples
+
+#### Using Templates
+
+```bash
+# Create a code review template
+orc template create code-review \
+  --system "You are an expert code reviewer. Focus on best practices, security, and performance." \
+  --prompt "Please review the following code:\n\n{prompt}\n\nProvide feedback on:\n1. Code quality\n2. Potential bugs\n3. Performance issues\n4. Security concerns" \
+  --models gpt-4-turbo claude-3-opus-20240229 \
+  --temperature 0.3
+
+# Use the template with a file
+orc ask "Review for production readiness" --template code-review --file app.js
+```
+
+#### Batch Processing
+
+Create a file `prompts.txt`:
+```
+Explain the concept of recursion
+Write a quicksort implementation in Python
+What are the SOLID principles?
+Compare REST vs GraphQL
+```
+
+Then process all prompts:
+```bash
+orc batch prompts.txt --models gpt-4-turbo claude-3-haiku-20240307 --output results.md --format markdown
+```
+
+#### Prompt Chaining Example
+
+```bash
+# Create a content pipeline
+orc chain \
+  --steps \
+  "Write a 200-word article about {input}" \
+  "Extract 5 key points from this article: {input}" \
+  "Create a Twitter thread from these points: {input}" \
+  --models claude-3-opus-20240229
+
+# When prompted, enter: "artificial intelligence in healthcare"
+# The chain will:
+# 1. Write an article about AI in healthcare
+# 2. Extract key points from the article
+# 3. Create a Twitter thread from those points
+```
+
+#### Code Analysis
+
+```bash
+# Analyze a specific file with context
+orc ask "Explain the main functionality and suggest improvements" \
+  --file src/utils/auth.js \
+  --models gpt-4-turbo
+
+# Compare multiple implementations
+orc ask "Compare these sorting algorithms and explain their trade-offs" \
+  --files sort-bubble.py sort-quick.py sort-merge.py
+
+# Analyze recent git changes
+orc git-diff HEAD~5 --models claude-3-opus-20240229
+# Then when prompted: "What are the main changes and their impact on the codebase?"
+```
+
 ### Interactive Chat Session
 
 ```bash
@@ -181,10 +334,11 @@ You: /models
 You: /exit
 ```
 
-## Configuration File
+## Configuration Files
 
-Configuration is stored in `~/.openrouter-cli/config.json`:
+Configuration is stored in `~/.openrouter-cli/`:
 
+### Main Configuration (`config.json`)
 ```json
 {
   "apiKey": "your-api-key",
@@ -198,6 +352,22 @@ Configuration is stored in `~/.openrouter-cli/config.json`:
     }
   }
 }
+```
+
+### Templates (`templates.json`)
+```json
+[
+  {
+    "name": "code-review",
+    "system": "You are an expert code reviewer.",
+    "prompt": "Review the following code: {prompt}",
+    "models": ["gpt-4-turbo"],
+    "temperature": 0.3,
+    "maxTokens": 2000,
+    "createdAt": "2024-01-01T00:00:00.000Z",
+    "updatedAt": "2024-01-01T00:00:00.000Z"
+  }
+]
 ```
 
 ## Environment Variables
