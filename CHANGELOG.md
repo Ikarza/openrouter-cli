@@ -1,3 +1,10 @@
+# [1.1.0](https://github.com/Ikarza/openrouter-cli/compare/v1.0.0...v1.1.0) (2025-06-03)
+
+
+### Features
+
+* Updated doc ([d2bbfdf](https://github.com/Ikarza/openrouter-cli/commit/d2bbfdffea9595159499b7ee46d623c582436feb))
+
 # 1.0.0 (2025-05-31)
 
 
