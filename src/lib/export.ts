@@ -68,7 +68,7 @@ export class ConversationExporter {
   private processMarkdownContent(content: string): string {
     // Ensure code blocks are properly formatted
     const codeBlockRegex = /```(\w+)?\n([\s\S]*?)```/g;
-    return content.replace(codeBlockRegex, (match, lang, code) => {
+    return content.replace(codeBlockRegex, (_match, lang, code) => {
       return `\`\`\`${lang || ''}\n${code.trim()}\n\`\`\``;
     });
   }
@@ -185,7 +185,7 @@ export class ConversationExporter {
       .replace(/>/g, '&gt;');
 
     // Convert markdown code blocks to HTML
-    processed = processed.replace(/```(\w+)?\n([\s\S]*?)```/g, (match, lang, code) => {
+    processed = processed.replace(/```(\w+)?\n([\s\S]*?)```/g, (_match, lang, code) => {
       const trimmedCode = code.trim();
       if (syntaxHighlight && lang) {
         return `<pre><code class="language-${lang}">${this.highlightCode(trimmedCode, lang)}</code></pre>`;
@@ -271,8 +271,8 @@ export class ConversationImporter {
     }
 
     // Find root and traverse
-    const visited = new Set();
-    for (const [id, node] of messageMap.entries()) {
+    const visited = new Set<string>();
+    for (const [id, _node] of messageMap.entries()) {
       if (!visited.has(id)) {
         this.traverseChatGPTMessages(id, messageMap, messages, visited);
       }

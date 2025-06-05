@@ -76,9 +76,16 @@ export class TemplateManager {
       throw new Error(`Template '${name}' not found`);
     }
 
+    const existingTemplate = templates[index];
+    if (!existingTemplate) {
+      throw new Error(`Template '${name}' not found`);
+    }
+    
     templates[index] = {
-      ...templates[index],
+      ...existingTemplate,
       ...updates,
+      name: existingTemplate.name,
+      createdAt: existingTemplate.createdAt,
       updatedAt: new Date()
     };
 
