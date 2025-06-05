@@ -1,6 +1,6 @@
 {
   "name": "openrouter-cli",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "A powerful command-line interface for interacting with multiple AI models through OpenRouter's unified API",
   "main": "dist/index.js",
   "type": "module",
@@ -28,7 +28,7 @@
     "command-line",
     "terminal"
   ],
-  "author": "Your Name <your.email@example.com>",
+  "author": "Zaakir <zaakirio@pm.me>",
   "license": "MIT",
   "repository": {
     "type": "git",
