@@ -28,7 +28,7 @@ After installation, the CLI will be available as `orc`.
 
 1. **Set your OpenRouter API key:**
    ```bash
-   orc config set-key YOUR_API_KEY
+   orc config set apiKey YOUR_API_KEY
    ```
 
 2. **Ask a question:**
