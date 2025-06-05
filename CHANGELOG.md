@@ -1,3 +1,10 @@
+# [1.2.0](https://github.com/Ikarza/openrouter-cli/compare/v1.1.0...v1.2.0) (2025-06-05)
+
+
+### Features
+
+* **chat:** Added parallel chat stream ([8d6aff4](https://github.com/Ikarza/openrouter-cli/commit/8d6aff4b1c69560f8f15e424ca9a6422e7cb1260))
+
 # [1.1.0](https://github.com/Ikarza/openrouter-cli/compare/v1.0.0...v1.1.0) (2025-06-03)
 
 
