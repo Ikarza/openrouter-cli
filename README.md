@@ -1,6 +1,6 @@
 # OpenRouter CLI (ORC)
 
-A powerful command-line interface for interacting with multiple AI models through [OpenRouter](https://openrouter.ai's) unified API.
+A powerful command-line interface for interacting with AI models via [OpenRouter](https://openrouter.ai's) API.
 
 ## Features
 
@@ -40,43 +40,6 @@ After installation, the CLI will be available as `orc`.
    ```bash
    orc chat
    ```
-
-## 📚 Documentation
-
-- **[Quick Start Guide](docs/QUICK_START.md)** - Get up and running in 5 minutes
-- **[Complete User Guide](docs/USER_GUIDE.md)** - Comprehensive documentation with examples
-- **[Features Overview](docs/FEATURES.md)** - Detailed feature explanations with visual examples
-- **[Recipes](docs/RECIPES.md)** - Practical workflows and automation examples
-
-## 🎯 Featured Examples
-
-### Multi-Model Comparison
-```bash
-# Compare responses from multiple models
-orc ask "Explain quantum computing" --models gpt-4-turbo claude-3-opus gemini-pro
-```
-
-### Code Analysis
-```bash
-# Analyze code files directly
-orc ask "Review this code for security issues" --file app.js --profile security
-```
-
-### Batch Processing
-```bash
-# Process multiple prompts from a file
-orc batch questions.txt --models gpt-4 claude-3 --output answers.md --format markdown
-```
-
-### Prompt Chaining
-```bash
-# Chain prompts for complex workflows
-orc chain --models gpt-4 \
-  --steps \
-    "Write a blog outline about {input}" \
-    "Expand the outline into a full post: {input}" \
-    "Create SEO metadata: {input}"
-```
 
 ## Commands
 
@@ -181,7 +144,7 @@ orc template create code-review \
   --system "You are a code reviewer" \
   --prompt "Review the following code: {prompt}" \
   --models gpt-4-turbo claude-3-opus-20240229 \
-  --temperature 0.3
+  --temperature 0.7
 
 # List all templates
 orc template list

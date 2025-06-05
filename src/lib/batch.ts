@@ -1,7 +1,9 @@
 import * as fs from 'fs/promises';
 import { createReadStream } from 'fs';
 import * as readline from 'readline';
-import { OpenRouterClient } from './api.js';
+import { OpenRouterClient } from './api';
+import { ConfigManager } from './config';
+import { ModelInfo } from '../types';
 import chalk from 'chalk';
 import ora from 'ora';
 
@@ -17,9 +19,11 @@ export interface BatchResult {
 
 export class BatchProcessor {
   private client: OpenRouterClient;
+  private config: ConfigManager;
 
-  constructor(apiKey: string) {
-    this.client = new OpenRouterClient(apiKey);
+  constructor() {
+    this.config = new ConfigManager();
+    this.client = new OpenRouterClient(this.config.getApiKey());
   }
 
   async processFile(
@@ -41,7 +45,7 @@ export class BatchProcessor {
       
       try {
         const result = await this.processPrompt(
-          prompts[i] || '',
+          prompts[i],
           models,
           options.temperature,
           options.maxTokens
@@ -50,7 +54,7 @@ export class BatchProcessor {
       } catch (error) {
         spinner.fail(`Error processing prompt ${i + 1}: ${error}`);
         results.push({
-          prompt: prompts[i] || '',
+          prompt: prompts[i],
           responses: models.map(model => ({
             model,
             response: '',
@@ -89,7 +93,7 @@ export class BatchProcessor {
     return prompts;
   }
 
-  async processPrompt(
+  private async processPrompt(
     prompt: string,
     models: string[],
     temperature?: number,
@@ -101,10 +105,9 @@ export class BatchProcessor {
           const response = await this.client.chat(
             [{ role: 'user', content: prompt }],
             model,
-            {
-              temperature,
-              maxTokens
-            }
+            false,
+            temperature,
+            maxTokens
           );
           return { model, response };
         } catch (error) {
@@ -197,7 +200,6 @@ export class BatchProcessor {
 }
 
 export async function chainPrompts(
-  apiKey: string,
   initialPrompt: string,
   models: string[],
   chainSteps: string[],
@@ -206,7 +208,7 @@ export async function chainPrompts(
     maxTokens?: number;
   } = {}
 ): Promise<BatchResult[]> {
-  const processor = new BatchProcessor(apiKey);
+  const processor = new BatchProcessor();
   const results: BatchResult[] = [];
   let currentInput = initialPrompt;
 
@@ -215,10 +217,8 @@ export async function chainPrompts(
   for (let i = 0; i < chainSteps.length; i++) {
     spinner.text = `Processing step ${i + 1}/${chainSteps.length}...`;
     
-    const step = chainSteps[i];
-    if (!step) continue;
-    const prompt = step.replace(/\{input\}/g, currentInput);
-    const result = await processor.processPrompt(
+    const prompt = chainSteps[i].replace(/\{input\}/g, currentInput);
+    const result = await processor['processPrompt'](
       prompt,
       models,
       options.temperature,
@@ -228,7 +228,7 @@ export async function chainPrompts(
     results.push(result);
     
     // Use the first successful response as input for the next step
-    const successfulResponse = result.responses.find(r => !r.error && r.response);
+    const successfulResponse = result.responses.find(r => !r.error);
     if (successfulResponse) {
       currentInput = successfulResponse.response;
     } else {

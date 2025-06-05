@@ -2,6 +2,7 @@ import * as fs from 'fs/promises';
 import { exec } from 'child_process';
 import { promisify } from 'util';
 import * as path from 'path';
+import chalk from 'chalk';
 
 const execAsync = promisify(exec);
 

@@ -478,7 +478,7 @@ program
         return;
       }
       
-      const processor = new BatchProcessor(apiKey);
+      const processor = new BatchProcessor();
       await processor.processFile(file, options.models, {
         temperature: options.temperature,
         maxTokens: options.maxTokens,
@@ -518,7 +518,6 @@ program
       ]);
       
       const results = await chainPrompts(
-        apiKey,
         initialPrompt,
         options.models,
         options.steps || [],

@@ -28,7 +28,6 @@ export interface ChatMessage {
   role: 'user' | 'assistant' | 'system';
   content: string;
   model?: string;
-  name?: string;
 }
 
 export interface ChatOptions {
