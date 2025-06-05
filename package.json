@@ -12,8 +12,15 @@
     "dev": "tsx src/index.ts",
     "start": "node dist/index.js",
     "watch": "tsc --watch",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prepublishOnly": "npm run build"
   },
+  "files": [
+    "dist/",
+    "README.md",
+    "LICENSE",
+    "config/"
+  ],
   "keywords": [
     "openrouter",
     "ai",
@@ -39,10 +46,13 @@
   },
   "homepage": "https://github.com/Ikarza/openrouter-cli#readme",
   "dependencies": {
+    "@types/react": "^19.1.6",
     "chalk": "^5.3.0",
     "commander": "^12.0.0",
+    "ink": "^6.0.0",
     "inquirer": "^9.2.15",
-    "ora": "^8.0.1"
+    "ora": "^8.0.1",
+    "react": "^19.1.0"
   },
   "devDependencies": {
     "@semantic-release/changelog": "^6.0.3",
