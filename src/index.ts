@@ -8,6 +8,8 @@ import configManager from './lib/config.js';
 import { ModelManager } from './lib/models.js';
 import profileManager from './lib/profiles.js';
 import { startChat, askQuestion } from './lib/chat.js';
+import { startInkChat } from './lib/ink-chat.js';
+import { startParallelChat } from './lib/parallel-chat.js';
 import OpenRouterClient from './lib/api.js';
 import { templateManager } from './lib/templates.js';
 import { BatchProcessor, chainPrompts } from './lib/batch.js';
@@ -378,10 +380,33 @@ template
     }
   });
 
-// Chat command
+// Chat command (React/Ink parallel streaming interface)
 program
   .command('chat')
-  .description('Start interactive chat session')
+  .description('Start interactive chat session with parallel model responses')
+  .option('-p, --profile <name>', 'Use specific profile')
+  .option('-m, --model <model-id>', 'Use specific model')
+  .option('--models <models...>', 'Use specific models (space-separated)')
+  .action(async (options: { profile?: string; model?: string; models?: string[] }) => {
+    try {
+      await configManager.init();
+      const apiKey = configManager.getApiKey();
+      
+      if (!apiKey) {
+        console.log(chalk.red('No API key found. Please run: orc config set-key <your-key>'));
+        return;
+      }
+      
+      await startInkChat(apiKey, options);
+    } catch (error) {
+      console.error(chalk.red('Error:', (error as Error).message));
+    }
+  });
+
+// Legacy chat command (original sequential interface)
+program
+  .command('chat-legacy')
+  .description('Start interactive chat session (legacy sequential interface)')
   .option('-p, --profile <name>', 'Use specific profile')
   .option('-m, --model <model-id>', 'Use specific model')
   .action(async (options: { profile?: string; model?: string }) => {
@@ -390,7 +415,7 @@ program
       const apiKey = configManager.getApiKey();
       
       if (!apiKey) {
-        console.log(chalk.red('No API key found. Please run: orb config set-key <your-key>'));
+        console.log(chalk.red('No API key found. Please run: orc config set-key <your-key>'));
         return;
       }
       
@@ -399,6 +424,7 @@ program
       console.error(chalk.red('Error:', (error as Error).message));
     }
   });
+
 
 // Ask command
 program
